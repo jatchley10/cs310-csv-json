@@ -55,6 +55,59 @@ public class Converter {
             JSONObject jsonObject = new JSONObject();
             
             // INSERT YOUR CODE HERE
+            //Getting the headings of the columns
+            String[] cols = iterator.next();
+            
+            //Adding column names to JSONARRAY
+            JSONArray colHeadings = new JSONArray();
+            for(int i = 0; i < cols.length; ++i){
+                colHeadings.add(cols[i]);
+            }
+            
+           
+            
+     
+            
+            //Getting rowheaders
+            JSONArray rowHeadings = new JSONArray();
+            for(int i = 1; i < full.size();++i){
+                rowHeadings.add(full.get(i)[0]);
+                
+            }
+            
+            //Getting data values
+            JSONArray data = new JSONArray();
+            for(int i = 1; i < full.size();++i){
+                data.add(Arrays.toString(Arrays.copyOfRange(full.get(i), 1, full.get(i).length)));
+            }
+            
+            
+            jsonObject.put("colHeaders", colHeadings);
+            jsonObject.put("rowHeaders",rowHeadings);
+            jsonObject.put("data", data);
+            
+            
+            
+            //adding the columns to the final product
+            
+            results = "{";
+            //adding the row part to the final product
+            results += "\"rowHeaders\":" + jsonObject.get("rowHeaders") + ",";
+            
+            //adding the data part
+            //Had to remove spaces within the array that caused my tests to fail
+            results += "\"data\":" + data.toString().replaceAll("\"", "").replaceAll("\\s", "");
+             
+                
+            
+            results += ",\"colHeaders\":" + jsonObject.get("colHeaders");
+            
+            results += "}";
+            
+            
+           
+            
+            
             
         }
         
@@ -77,6 +130,44 @@ public class Converter {
             CSVWriter csvWriter = new CSVWriter(writer, ',', '"', '\n');
             
             // INSERT YOUR CODE HERE
+            JSONArray colHeaders = (JSONArray) jsonObject.get("colHeaders");
+            JSONArray rowHeaders = (JSONArray) jsonObject.get("rowHeaders");
+            JSONArray data = (JSONArray) jsonObject.get("data");
+            
+            
+            //Adding the columns to the string with quotes
+            for(int i = 0; i < colHeaders.size();++i){
+                if(i != colHeaders.size()-1){
+                    results += "\""+ colHeaders.get(i)+ "\""+",";
+                }
+                else{
+                    results+= "\""+ colHeaders.get(i)+ "\"";
+                }
+                
+            }
+            results += "\n";
+            
+            
+            //Combining Rows and Data
+            
+            for(int i = 0; i < rowHeaders.size();++i){
+                ArrayList combine = new ArrayList<String>();
+                String row = "\"" + rowHeaders.get(i) + "\"";
+                combine.add(row);
+                JSONArray sub = (JSONArray) data.get(i);
+                
+                for(int j = 0; j < sub.size();++j){
+                    String indData = "\"" + sub.get(j) + "\"";
+                    combine.add(indData);
+                }
+                
+                results += combine.toString().replace("[", "").replace("]", "").replace(", ", ",") + "\n";
+                
+               
+                
+            }
+            
+            
             
         }
         
